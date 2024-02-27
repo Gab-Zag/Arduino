@@ -7,7 +7,7 @@
 #define PINO_VELOCIDADE_M2 13
 
 //arma
-
+#define PINO_ARMA 18
 
 ControllerPtr myControllers[BP32_MAX_GAMEPADS];
 
@@ -77,6 +77,7 @@ void processControllers() {
           digitalWrite(PINO_VELOCIDADE_M2, LOW);
         }
       }
+
     }
 
     else Serial.println("Não foi possível ler o controle");
@@ -94,6 +95,9 @@ void setup() {
   pinMode(PINO_SENTIDO_M1, OUTPUT);
   digitalWrite(PINO_SENTIDO_M1, HIGH);
   pinMode(PINO_VELOCIDADE_M1, OUTPUT);
+  pinMode(PINO_SENTIDO_M2, OUTPUT);
+  digitalWrite(PINO_SENTIDO_M2, HIGH);
+  pinMode(PINO_VELOCIDADE_M2, OUTPUT);
 }
 
 void loop() {
