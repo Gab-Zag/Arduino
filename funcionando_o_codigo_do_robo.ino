@@ -1,7 +1,13 @@
 #include <Bluepad32.h>
 
+//rodas
 #define PINO_SENTIDO_M1 27
 #define PINO_VELOCIDADE_M1 14
+#define PINO_SENTIDO_M2 12
+#define PINO_VELOCIDADE_M2 13
+
+//arma
+
 
 ControllerPtr myControllers[BP32_MAX_GAMEPADS];
 
@@ -47,20 +53,28 @@ void processControllers() {
     if (myController && myController->isConnected() && myController->hasData() && myController->isGamepad()) {
 
       int medida = myController->axisRY();
+      int medida2 = myController->axisX();
       Serial.println(medida);
 
+      //Ponte h 1
       if(medida < 0 ){
         digitalWrite(PINO_SENTIDO_M1, HIGH);
         digitalWrite(PINO_VELOCIDADE_M1, LOW);
+        digitalWrite(PINO_SENTIDO_M2, HIGH);
+        digitalWrite(PINO_VELOCIDADE_M2, LOW);
       }
       else{
         if(medida > 0){
           digitalWrite(PINO_SENTIDO_M1, LOW);
           digitalWrite(PINO_VELOCIDADE_M1, HIGH);
+          digitalWrite(PINO_SENTIDO_M2, LOW);
+          digitalWrite(PINO_VELOCIDADE_M2, HIGH);
         }
         else{
           digitalWrite(PINO_SENTIDO_M1, LOW);
           digitalWrite(PINO_VELOCIDADE_M1, LOW);
+          digitalWrite(PINO_SENTIDO_M2, LOW);
+          digitalWrite(PINO_VELOCIDADE_M2, LOW);
         }
       }
     }
