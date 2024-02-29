@@ -12,7 +12,7 @@
 
 ControllerPtr myControllers[BP32_MAX_GAMEPADS];
 
-bool roboLigado, armaLigada;
+bool roboLigado, armaLigada = false;
 
 void onConnectedController(ControllerPtr ctl) {
   bool foundEmptySlot = false;
@@ -56,7 +56,7 @@ void processControllers() {
 
     if (myController && myController->isConnected() && myController->hasData() && myController->isGamepad()) {
 
-      uint16_t botoesMisc = myController->miscButtons();
+      uint16_t botoesMisc = myController-> miscButtons();
 
       if (botoesMisc == 0x04)
         roboLigado = !roboLigado;
@@ -65,8 +65,9 @@ void processControllers() {
 
         uint16_t botoesPressionados = myController->buttons();
 
-        if (botoesPressionados == 0x0001) {  // se pressionou apenas X
-          digitalWrite(PINO_SENTIDO_ARMA, !digitalRead(PINO_SENTIDO_ARMA));
+        if (botoesPressionados == 0x0008) {  // se pressionou apenas X
+
+          //digitalWrite(PINO_SENTIDO_ARMA, !digitalRead(PINO_SENTIDO_ARMA));
           armaLigada = !armaLigada;
           if (armaLigada){
             digitalWrite(PINO_VELOCIDADE_ARMA, HIGH);
@@ -76,9 +77,9 @@ void processControllers() {
           }
         }
 
-        int32_t valorAnalogicoDireito = myController->axisRY();
-        int32_t valorAnalogicoEsquerdo = myController->axisX();
-
+        int16_t valorAnalogicoDireito = myController->axisRY();
+        int16_t valorAnalogicoEsquerdo = myController->axisX();
+        Serial.println (valorAnalogicoDireito);
         if (valorAnalogicoDireito == 0) {
           analogWrite(PINO_VELOCIDADE_M1, 0);
           analogWrite(PINO_VELOCIDADE_M2, 0);
@@ -86,14 +87,14 @@ void processControllers() {
 
         else {
 
-          if (valorAnalogicoDireito > 0) {
-            digitalWrite(PINO_SENTIDO_M1, LOW);
-            digitalWrite(PINO_SENTIDO_M2, LOW);
+          if (valorAnalogicoDireito == 126) {
+            digitalWrite(PINO_VELOCIDADE_M1, HIGH);
+            digitalWrite(PINO_VELOCIDADE_M2, HIGH);
           }
 
           else {
-            digitalWrite(PINO_SENTIDO_M1, HIGH);
-            digitalWrite(PINO_SENTIDO_M2, HIGH);
+            digitalWrite(PINO_VELOCIDADE_M1, LOW);
+            digitalWrite(PINO_VELOCIDADE_M2, LOW);
           }
 
           int pwmMotorDireito = abs(valorAnalogicoDireito) - valorAnalogicoEsquerdo;
@@ -101,7 +102,7 @@ void processControllers() {
 
           pwmMotorDireito = map(pwmMotorDireito, 0, 1024, 0, 255);
           pwmMotorEsquerdo = map(pwmMotorEsquerdo, 0, 1024, 0, 255);
-
+          Serial.print (pwmMotorDireito);
           analogWrite(PINO_VELOCIDADE_M1, pwmMotorDireito);
           analogWrite(PINO_VELOCIDADE_M2, pwmMotorEsquerdo);
         }
@@ -112,7 +113,7 @@ void processControllers() {
         analogWrite(PINO_VELOCIDADE_M2, 0);
         digitalWrite(PINO_VELOCIDADE_ARMA, false);
       }
-    } else Serial.println("Não foi possível ler o controle");
+    } else Serial.println("");
   }
 }
 
