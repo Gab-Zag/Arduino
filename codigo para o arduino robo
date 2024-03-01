@@ -1,0 +1,110 @@
+#include <Servo.h>
+
+Servo ESC;
+
+unsigned long tempoBTAtivo;
+unsigned long tempoBTInativo = 500;
+const long intervalo = 1000;
+
+int mef = 6;
+int met = 5; 
+int mdf = 11; 
+int mdt = 3; 
+
+int x = 0;
+int y = 0;
+
+int MotorD = 0;
+int MotorE = 0;
+
+int xlido = 0;
+int ylido = 0;
+int armalido = 0;
+int arma = 0;
+
+uint8_t buf[4];
+int i = 0;
+
+void setup() 
+{       
+  Serial.begin(9600);  
+  
+  // Inicialização dos pinos de controle dos motores
+  analogWrite(mef, 0);
+  analogWrite(met, 0);
+  analogWrite(mdf, 0);
+  analogWrite(mdt, 0);
+   
+  // Definição dos valores iniciais do buffer
+  buf[0] = 128;
+  buf[1] = 128;
+  buf[2] = 1;
+  buf[3] = 128;
+
+  // Inicialização do servo motor
+  ESC.attach(9);
+  ESC.write(10);
+  delay(1000);
+}
+
+void loop()
+{ 
+    i = 0;
+    while(Serial.available() > 0){
+      tempoBTAtivo = millis();
+      buf[i] = Serial.read();
+      i++;  
+      delay(5);
+    }
+
+    tempoBTInativo = millis();
+    if (tempoBTInativo - tempoBTAtivo >= intervalo) 
+    {
+      tempoBTAtivo = tempoBTInativo;
+      buf[0] = 128;
+      buf[1] = 128;
+      buf[2] = 1;
+      buf[3] = 128;
+    }
+
+    // Mapeamento dos valores lidos para as faixas adequadas de controle
+    xlido = buf[0];
+    ylido = buf[1];
+    armalido = buf[2];
+    arma = map(armalido, 0, 255, 10, 180); // Corrigindo o intervalo de mapeamento
+    x = map(xlido, 0, 255, -110, 110);   
+    y = map(ylido, 0, 255, -110, 110);
+    MotorD = constrain((y - x), -100, 100); // Corrigindo o uso do constrain
+    MotorE = constrain((y + x), -100, 100); // Corrigindo o uso do constrain
+
+    ESC.write(arma);
+  
+    // Controle dos motores
+    if (MotorD >= 5){
+      analogWrite(mdf, map(MotorD, 0, 100, 0, 255));
+      analogWrite(mdt, 0);
+    }
+    else if(MotorD <= -5){
+      analogWrite(mdf, 0);
+      analogWrite(mdt, map(MotorD, 0, -100, 0, 255)); // Corrigindo o mapeamento
+    }
+    else {
+      analogWrite(mdf, 0);
+      analogWrite(mdt, 0);      
+    }
+  
+    if (MotorE >= 5){
+      analogWrite(mef, map(MotorE, 0, 100, 0, 255));
+      analogWrite(met, 0);      
+    }
+    else if(MotorE <= -5){
+      analogWrite(mef, 0);
+      analogWrite(met, map(MotorE, 0, -100, 0, 255)); // Corrigindo o mapeamento
+    }
+    else {
+      analogWrite(mef, 0);
+      analogWrite(met, 0);      
+    }
+  
+  delay(10);      
+}
