@@ -63,6 +63,11 @@ void Inputs_do_Controle(){
     }
 
     sentidoY = horario;
+
+    if(ValorAnalogicoHorizontal > toleranciaAnalogico){
+      pwmMotorDireito = map(ValorAnalogicoVertical - ValorAnalogicoHorizontal, -6, 7, 255, 0);
+      pwmMotorEsquerdo = map(ValorAnalogicoVertical + ValorAnalogicoHorizontal, 6, -7, 255, 0);
+    }
   }
 }
 
