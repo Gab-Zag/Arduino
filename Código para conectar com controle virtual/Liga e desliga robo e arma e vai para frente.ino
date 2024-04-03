@@ -16,6 +16,7 @@ int sentidoX;
 const int parado = 0;
 const int horario = 1;
 const int antihorario = 2;
+const int16_t toleranciaAnalogico = 2;
 
 bool roboLigado;
 
@@ -49,6 +50,19 @@ void Inputs_do_Controle(){
       digitalWrite(PINO_ARMA, HIGH);
       Serial.println("Arma Ligada");
     }
+
+    int16_t ValorAnalogicoHorizontal = GamePad.getXaxisData();
+    int16_t ValorAnalogicoVertical = -GamePad.getYaxisData();
+
+    int pwmMotorDireito = 0;
+    int pwmMotorEsquerdo = 0;
+
+    if(ValorAnalogicoVertical > toleranciaAnalogico){
+      analogWrite(VELOCIDADE_MOTOR_DIREITO = 7);
+      analogWrite(VELOCIDADE_MOTOR_ESQUERDO = 7);
+    }
+
+    sentidoY = horario;
   }
 }
 
